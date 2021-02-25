@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import authenticate
 from rest_framework.views import APIView
 from web.models import Customer, ConfirmationCode
 from .forms import UserOurRegistration
@@ -62,3 +63,18 @@ class ConfirmApiView(APIView):
             token = Token.objects.create(user=self.request.user)
         return Response(data={'token': token.key},
                         status=status.HTTP_200_OK)
+
+
+class LoginApiView(APIView):
+    def post(self, request):
+        user = authenticate(username=request.data['username'],
+                            password=request.data.get('password', 'admin123'))
+        if not user:
+            return Response(status=status.HTTP_404_NOT_FOUND,
+                            data={'message': 'User not found'})
+        else:
+            try:
+                token = Token.objects.get(user=user)
+            except Token.DoesNotExist:
+                token = Token.objects.create(user=user)
+            return Response(data={'token': token.key}, status=status.HTTP_200_OK)

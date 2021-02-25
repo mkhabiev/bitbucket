@@ -28,6 +28,7 @@ urlpatterns = [
     path('login/', authViews.LoginView.as_view(template_name='login.html'), name='login'),
     path('exit/', authViews.LogoutView.as_view(template_name='web/index.html'), name='exit'),
     path('confirm/', views.ConfirmApiView.as_view()),
+    path('api/v1/login/', views.LoginApiView.as_view()),
 ]
 
 if settings.DEBUG:
